@@ -13,11 +13,21 @@ AMorphCharacter::AMorphCharacter()
 	RootComponent = Capsule;
 
 	// Initialize configuration values
-	Acceleration = 500.f;
-	TurnSpeed = 50.f;
-	MaxSpeed = 4000.f;
-	MinSpeed = 500.f;
-	CurrentForwardSpeed = 500.f;
+	FlyingAcceleration = 500.f;
+	FlyingTurnSpeed = 50.f;
+	FlyingMaxSpeed = 4000.f;
+	FlyingMinSpeed = 500.f;
+
+	WalkingAcceleration = 2000.f;
+	WalkingTurnSpeed = 50.f;
+	WalkingMaxSpeed = 500.f;
+	WalkingMinSpeed = -500.f;
+
+	Gravity = -981.f;
+
+	// Default to the dude state
+	CurrentMorphType = EMorphType::MT_Dude;
+	ResetWalkConfig();
 
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -28,15 +38,30 @@ void AMorphCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (CurrentMorphType == EMorphType::MT_Bird)
+	{
+		ResetFlightConfig();
+	}
+	else
+	{
+		ResetWalkConfig();
+	}
+
 }
 
 // Called every frame
 void AMorphCharacter::Tick( float DeltaTime )
 {
-	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, 0.f);
+	FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, CurrentRightSpeed * DeltaTime, 0.f);
 
 	// Move character forwards (with sweep so we stop when we collide with things)
 	AddActorLocalOffset(LocalMove, true);
+
+	CalculateGravity();
+	FVector GravityMove = FVector(0.f, 0.f, CurrentDownSpeed * DeltaTime);
+	FHitResult floorHit;
+	AddActorLocalOffset(GravityMove, true, &floorHit);
+	CurrentDownSpeed = floorHit.bBlockingHit ? floorHit.Distance : CurrentDownSpeed;
 
 	// Calculate change in rotation this frame
 	FRotator DeltaRotation(0, 0, 0);
@@ -56,8 +81,11 @@ void AMorphCharacter::NotifyHit(class UPrimitiveComponent* MyComp, class AActor*
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	FRotator CurrentRotation = GetActorRotation(RootComponent);
-	SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
+	if (CurrentMorphType == EMorphType::MT_Bird)
+	{
+		FRotator CurrentRotation = GetActorRotation(RootComponent);
+		SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
+	}
 }
 
 // Called to bind functionality to input
@@ -68,53 +96,148 @@ void AMorphCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 	UE_LOG(MorphCharacterLog, Log, TEXT("I set up the player input"));
 
 	// Bind our control axis' to callback functions
-	InputComponent->BindAxis("Move Forward", this, &AMorphCharacter::ThrustInput);
-	InputComponent->BindAxis("Look Up", this, &AMorphCharacter::MoveUpInput);
-	InputComponent->BindAxis("Look Right", this, &AMorphCharacter::MoveRightInput);
+	InputComponent->BindAxis("Move Forward", this, &AMorphCharacter::MoveForwardInput);
+	InputComponent->BindAxis("Move Right", this, &AMorphCharacter::MoveRightInput);
+	InputComponent->BindAxis("Look Up", this, &AMorphCharacter::LookUpInput);
+	InputComponent->BindAxis("Look Right", this, &AMorphCharacter::LookRightInput);
 }
 
-void AMorphCharacter::ThrustInput(float Val)
+void AMorphCharacter::ResetFlightConfig()
 {
-	UE_LOG(MorphCharacterLog, Log, TEXT("Thrust input happened %f"), Val);
+	Acceleration = FlyingAcceleration;
+	TurnSpeed = FlyingTurnSpeed;
+	MaxSpeed = FlyingMaxSpeed;
+	MinSpeed = FlyingMinSpeed;
+	CurrentForwardSpeed = MinSpeed;
+	CurrentRightSpeed = 0.f;
+	CurrentDownSpeed = 0.f;
+
+	CurrentYawSpeed = 0.f;
+	CurrentPitchSpeed = 0.f;
+	CurrentRollSpeed = 0.f;
+}
+
+void AMorphCharacter::ResetWalkConfig()
+{
+	Acceleration = WalkingAcceleration;
+	TurnSpeed = WalkingTurnSpeed;
+	MaxSpeed = WalkingMaxSpeed;
+	MinSpeed = WalkingMinSpeed;
+	CurrentForwardSpeed = 0.f;
+	CurrentRightSpeed = 0.f;
+	CurrentDownSpeed = 0.f;
+
+	CurrentYawSpeed = 0.f;
+	CurrentPitchSpeed = 0.f;
+	CurrentRollSpeed = 0.f;
+
+	FRotator resetRotation(0, 0, 0);
+	resetRotation.Yaw = GetActorRotation().Yaw;
+	SetActorRotation(resetRotation);
+}
+
+void AMorphCharacter::MoveForwardInput(float Val)
+{
 	// Is there no input?
 	bool bHasInput = !FMath::IsNearlyEqual(Val, 0.f);
-	// If input is not held down, reduce speed
-	float CurrentAcc = bHasInput ? (Val * Acceleration) : (-0.5f * Acceleration);
+	float CurrentAcc;
+	if (CurrentMorphType == EMorphType::MT_Dude)
+	{
+		// Find the value needed to approach 0
+		float StasisDirection = FMath::IsNearlyEqual(CurrentForwardSpeed, 0.f) ? 0.f : (-CurrentForwardSpeed * .5) / FMath::Abs(CurrentForwardSpeed);
+		// If input is not held down, reduce speed
+		CurrentAcc = bHasInput ? (Val * Acceleration) : (StasisDirection * Acceleration);
+	}
+	else {
+		// If input is not held down, reduce speed
+		CurrentAcc = bHasInput ? (Val * Acceleration) : (-0.5f * Acceleration);
+	}
 	// Calculate new speed
 	float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 	// Clamp between MinSpeed and MaxSpeed
 	CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 }
 
-void AMorphCharacter::MoveUpInput(float Val)
-{
-	UE_LOG(MorphCharacterLog, Log, TEXT("Move up input happened %f"), Val);
-	// Target pitch speed is based in input
-	float TargetPitchSpeed = (Val * TurnSpeed * -1.f);
-
-	// When steering, we decrease pitch slightly
-	TargetPitchSpeed += (FMath::Abs(CurrentYawSpeed) * -0.2f);
-
-	// Smoothly interpolate to target pitch speed
-	CurrentPitchSpeed = FMath::FInterpTo(CurrentPitchSpeed, TargetPitchSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
-}
-
 void AMorphCharacter::MoveRightInput(float Val)
 {
-	UE_LOG(MorphCharacterLog, Log, TEXT("Move right input happened %f"), Val);
+	// Move right if we're walking
+	if (CurrentMorphType == EMorphType::MT_Dude)
+	{
+		// Determine if there is input
+		bool bHasInput = !FMath::IsNearlyEqual(Val, 0.f);
+		// Find the value needed to approach 0
+		float StasisDirection = FMath::IsNearlyEqual(CurrentRightSpeed, 0.f) ? 0.f : (-CurrentRightSpeed * .5) / FMath::Abs(CurrentRightSpeed);
+		// Determine the current acceleration
+		float CurrentAcc = bHasInput ? (Val * Acceleration) : (StasisDirection * Acceleration);
+		// Apply the current acceleration
+		float NewRightSpeed = CurrentRightSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
+		// Clamp to the valid range
+		CurrentRightSpeed = FMath::Clamp(NewRightSpeed, -MaxSpeed, MaxSpeed);
+	}
+}
+
+void AMorphCharacter::LookUpInput(float Val)
+{
+	// Look up if we're flying
+	if (CurrentMorphType == EMorphType::MT_Bird)
+	{
+		// Target pitch speed is based in input
+		float TargetPitchSpeed = (Val * TurnSpeed * -1.f);
+
+		// When steering, we decrease pitch slightly
+		TargetPitchSpeed += (FMath::Abs(CurrentYawSpeed) * -0.2f);
+
+		// Smoothly interpolate to target pitch speed
+		CurrentPitchSpeed = FMath::FInterpTo(CurrentPitchSpeed, TargetPitchSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+	}
+}
+
+void AMorphCharacter::LookRightInput(float Val)
+{
+	// Is there any left/right input?
+	const bool bIsTurning = FMath::Abs(Val) > 0.2f;
+
 	// Target yaw speed is based on input
 	float TargetYawSpeed = (Val * TurnSpeed);
 
 	// Smoothly interpolate to target yaw speed
 	CurrentYawSpeed = FMath::FInterpTo(CurrentYawSpeed, TargetYawSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
 
-	// Is there any left/right input?
-	const bool bIsTurning = FMath::Abs(Val) > 0.2f;
+	// Roll if we're flying
+	if (CurrentMorphType == EMorphType::MT_Bird)
+	{
+		// If turning, yaw value is used to influence roll
+		// If not turning, roll to reverse current roll value
+		float TargetRollSpeed = bIsTurning ? (CurrentYawSpeed * 0.5f) : (GetActorRotation().Roll * -2.f);
 
-	// If turning, yaw value is used to influence roll
-	// If not turning, roll to reverse current roll value
-	float TargetRollSpeed = bIsTurning ? (CurrentYawSpeed * 0.5f) : (GetActorRotation().Roll * -2.f);
+		// Smoothly interpolate roll speed
+		CurrentRollSpeed = FMath::FInterpTo(CurrentRollSpeed, TargetRollSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+	}
+}
 
-	// Smoothly interpolate roll speed
-	CurrentRollSpeed = FMath::FInterpTo(CurrentRollSpeed, TargetRollSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+void AMorphCharacter::CalculateGravity()
+{
+	// Fall if we're walking
+	if (CurrentMorphType == EMorphType::MT_Dude)
+	{
+		CurrentDownSpeed = FMath::FInterpTo(CurrentDownSpeed, Gravity, GetWorld()->GetDeltaSeconds(), 2.f);
+		CurrentDownSpeed = FMath::Clamp(CurrentDownSpeed, Gravity, 0.f);
+	}
+}
+
+void AMorphCharacter::Transform()
+{
+	UE_LOG(MorphCharacterLog, Log, TEXT("Working on morphing"));
+	EMorphType previousType = CurrentMorphType;
+	CurrentMorphType = (CurrentMorphType == EMorphType::MT_Bird ? EMorphType::MT_Dude : EMorphType::MT_Bird);
+	OnTransform(CurrentMorphType, previousType);
+
+	if (CurrentMorphType == EMorphType::MT_Bird)
+	{
+		ResetFlightConfig();
+	}
+	else
+	{
+		ResetWalkConfig();
+	}
 }
