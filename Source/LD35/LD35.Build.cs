@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// See License.txt for copyright info
 
 using UnrealBuildTool;
 
