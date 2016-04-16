@@ -29,6 +29,9 @@ AMorphCharacter::AMorphCharacter()
 
 	Gravity = -981.f;
 
+	MaxBerries = 30;
+	CurrentBerries = 0;
+
 	// Default to the dude state
 	CurrentMorphType = EMorphType::MT_Dude;
 	ResetWalkConfig();
@@ -92,6 +95,25 @@ void AMorphCharacter::NotifyHit(class UPrimitiveComponent* MyComp, class AActor*
 	}
 }
 
+void AMorphCharacter::UseBerry(int Quantity)
+{
+	if (CurrentMorphType == EMorphType::MT_Bird)
+	{
+		if (Quantity > CurrentBerries)
+		{
+			Transform();
+		}
+		else {
+			CurrentBerries -= Quantity;
+		}
+	}
+}
+
+void AMorphCharacter::GrabBerry(int Quantity)
+{
+	CurrentBerries = FMath::Min(CurrentBerries + Quantity, MaxBerries);
+}
+
 // Called to bind functionality to input
 void AMorphCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
@@ -130,7 +152,6 @@ void AMorphCharacter::ResetWalkConfig()
 	TurnSpeed = WalkingTurnSpeed;
 	MaxSpeed = WalkingMaxSpeed;
 	MinSpeed = WalkingMinSpeed;
-	CurrentForwardSpeed = 0.f;
 	CurrentRightSpeed = 0.f;
 	CurrentDownSpeed = 0.f;
 
@@ -235,6 +256,11 @@ void AMorphCharacter::CalculateGravity()
 	}
 }
 
+void AMorphCharacter::TickBerry()
+{
+	UseBerry(1);
+}
+
 void AMorphCharacter::Transform()
 {
 	UE_LOG(MorphCharacterLog, Log, TEXT("Working on morphing"));
@@ -245,9 +271,11 @@ void AMorphCharacter::Transform()
 	if (CurrentMorphType == EMorphType::MT_Bird)
 	{
 		ResetFlightConfig();
+		GetWorldTimerManager().SetTimer<AMorphCharacter>(BerryTickTimer, this, &AMorphCharacter::TickBerry, 1.0f, true);
 	}
 	else
 	{
 		ResetWalkConfig();
+		GetWorldTimerManager().ClearTimer(BerryTickTimer);
 	}
 }
