@@ -30,9 +30,9 @@ This is a very loose plan of attack for the project. I plan to update it... yeah
 		* [ ] Model
 		* [ ] Texture
 * [ ] Arrange basic level 1
-* [ ] Program player movement
-	* [ ] Program person movement
-	* [ ] Program bird movement
+* [x] Program player movement
+	* [x] Program person movement
+	* [x] Program bird movement
 * [ ] Program berry pickup
 * [ ] Program shapeshift
 * [ ] Program energy consumption/requirement
