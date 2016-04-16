@@ -2,10 +2,10 @@ Project Roadmap
 ---------------
 This is a very loose plan of attack for the project. I plan to update it... yeah right.
 
-* [ ] Create Unreal project
+* [x] Create Unreal project
 * [ ] Create basic art assets
 	* [ ] Create player bird
-		* [ ] Model
+		* [x] Model
 		* [ ] Texture
 		* [ ] Animation
 			* [ ] Idle
