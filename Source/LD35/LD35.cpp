@@ -3,3 +3,5 @@
 #include "LD35.h"
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, LD35, "LD35" );
+
+DEFINE_LOG_CATEGORY(MorphCharacterLog);
