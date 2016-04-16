@@ -12,3 +12,4 @@ Build/*
 *.swp
 *.kra~
 *.VC.opendb
+*.blend[0-9]
