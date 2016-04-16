@@ -17,11 +17,15 @@ AMorphCharacter::AMorphCharacter()
 	FlyingTurnSpeed = 50.f;
 	FlyingMaxSpeed = 4000.f;
 	FlyingMinSpeed = 500.f;
+	FlyingCapsuleRadius = 30.f;
+	FlyingCapsuleHalfHeight = 30.f;
 
 	WalkingAcceleration = 2000.f;
 	WalkingTurnSpeed = 50.f;
 	WalkingMaxSpeed = 500.f;
 	WalkingMinSpeed = -500.f;
+	WalkingCapsuleRadius = 30.f;
+	WalkingCapsuleHalfHeight = 30.f;
 
 	Gravity = -981.f;
 
@@ -115,6 +119,9 @@ void AMorphCharacter::ResetFlightConfig()
 	CurrentYawSpeed = 0.f;
 	CurrentPitchSpeed = 0.f;
 	CurrentRollSpeed = 0.f;
+
+	Capsule->SetCapsuleRadius(FlyingCapsuleRadius);
+	Capsule->SetCapsuleHalfHeight(FlyingCapsuleHalfHeight);
 }
 
 void AMorphCharacter::ResetWalkConfig()
@@ -134,6 +141,9 @@ void AMorphCharacter::ResetWalkConfig()
 	FRotator resetRotation(0, 0, 0);
 	resetRotation.Yaw = GetActorRotation().Yaw;
 	SetActorRotation(resetRotation);
+
+	Capsule->SetCapsuleRadius(WalkingCapsuleRadius);
+	Capsule->SetCapsuleHalfHeight(WalkingCapsuleHalfHeight);
 }
 
 void AMorphCharacter::MoveForwardInput(float Val)

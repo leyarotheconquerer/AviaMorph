@@ -39,6 +39,14 @@ public:
 	UPROPERTY(Category = Flying, EditAnywhere)
 	float FlyingMinSpeed;
 
+	/** Flying capsule radius */
+	UPROPERTY(Category = Walking, EditAnywhere)
+	float FlyingCapsuleRadius;
+
+	/** Flying capsule half height */
+	UPROPERTY(Category = Walking, EditAnywhere)
+	float FlyingCapsuleHalfHeight;
+
 	/** How quickly forward speed changes while walking */
 	UPROPERTY(Category = Walking, EditAnywhere)
 	float WalkingAcceleration;
@@ -54,6 +62,14 @@ public:
 	/** Min forward walking speed */
 	UPROPERTY(Category = Walking, EditAnywhere)
 	float WalkingMinSpeed;
+
+	/** Walking capsule radius */
+	UPROPERTY(Category = Walking, EditAnywhere)
+	float WalkingCapsuleRadius;
+
+	/** Walking capsule half height */
+	UPROPERTY(Category = Walking, EditAnywhere)
+	float WalkingCapsuleHalfHeight;
 
 	/** Gravity */
 	UPROPERTY(Category = Walking, EditAnywhere)
