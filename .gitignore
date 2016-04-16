@@ -10,3 +10,5 @@ Build/*
 *.opensdf
 *.suo
 *.swp
+*.kra~
+*.VC.opendb
