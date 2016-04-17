@@ -26,6 +26,7 @@ AMorphCharacter::AMorphCharacter()
 	WalkingMinSpeed = -500.f;
 	WalkingCapsuleRadius = 30.f;
 	WalkingCapsuleHalfHeight = 30.f;
+	WalkCollisionBuffer = 0.1f;
 
 	Gravity = -981.f;
 
@@ -59,10 +60,20 @@ void AMorphCharacter::BeginPlay()
 // Called every frame
 void AMorphCharacter::Tick( float DeltaTime )
 {
+	FVector WalkBuffer = FVector(0, 0, WalkCollisionBuffer);
+	if (CurrentMorphType == EMorphType::MT_Dude)
+	{
+		AddActorLocalOffset(WalkBuffer);
+	}
 	FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, CurrentRightSpeed * DeltaTime, 0.f);
 
 	// Move character forwards (with sweep so we stop when we collide with things)
 	AddActorLocalOffset(LocalMove, true);
+
+	if (CurrentMorphType == EMorphType::MT_Dude)
+	{
+		AddActorLocalOffset(-WalkBuffer);
+	}
 
 	CalculateGravity();
 	FVector GravityMove = FVector(0.f, 0.f, CurrentDownSpeed * DeltaTime);
@@ -92,6 +103,24 @@ void AMorphCharacter::NotifyHit(class UPrimitiveComponent* MyComp, class AActor*
 	{
 		FRotator CurrentRotation = GetActorRotation(RootComponent);
 		SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
+	}
+	else
+	{
+		FVector ActorOrigin, ActorExtents;
+		GetActorBounds(true, ActorOrigin, ActorExtents);
+
+		const FVector traceLoc = ActorOrigin;
+		const FVector traceDir = FVector(0, 0, -1000.f);
+
+		FHitResult TraceResult;
+		FCollisionQueryParams TraceParams(FName(TEXT("WalkingTrace")), true, this);
+		TraceParams.bTraceAsyncScene = true;
+
+		GetWorld()->LineTraceSingleByChannel(TraceResult, traceLoc, traceLoc + traceDir, ECollisionChannel::ECC_Visibility, TraceParams);
+		if (TraceResult.bBlockingHit && TraceResult.Distance < ActorExtents.Z)
+		{
+				AddActorLocalOffset(FVector(0, 0, ActorExtents.Z - TraceResult.Distance + WalkCollisionBuffer));
+		}
 	}
 }
 
