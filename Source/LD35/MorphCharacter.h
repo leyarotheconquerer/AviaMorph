@@ -82,6 +82,14 @@ public:
 	/** Current moving forward speed */
 	UPROPERTY(Category = Movement, BlueprintReadOnly)
 	float CurrentForwardSpeed;
+
+	/** Maximum berries the player can hold */
+	UPROPERTY(Category = Berries, EditAnywhere, BlueprintReadOnly)
+	int MaxBerries;
+
+	/** Current number of berries held */
+	UPROPERTY(Category = Berries, EditAnywhere, BlueprintReadOnly)
+	int CurrentBerries;
 	
 	AMorphCharacter();
 
@@ -98,6 +106,14 @@ public:
 	/** Event called when character transforms */
 	UFUNCTION(BlueprintImplementableEvent, Category = Morph)
 	void OnTransform(EMorphType TargetMorphType, EMorphType PrevMorphType);
+
+	/** Uses berries to keep flying, or reverts to dude status */
+	UFUNCTION(BlueprintCallable, Category = Berries)
+	void UseBerry(int Quantity);
+
+	/** Grabs a berry and holds it for later use */
+	UFUNCTION(BlueprintCallable, Category = Berries)
+	void GrabBerry(int Quantity);
 
 	/** Returns Capsule subobject **/
 	FORCEINLINE class UCapsuleComponent* GetCapsule() const { return Capsule; }
@@ -126,6 +142,9 @@ protected:
 
 	/** Move a walking character down due to gravity */
 	void CalculateGravity();
+
+	/** Uses a single berry, once per tick */
+	void TickBerry();
 
 private:
 
@@ -159,4 +178,7 @@ private:
 
 	/** Current roll speed */
 	float CurrentRollSpeed;
+
+	/** Handle for the berry tick timer */
+	FTimerHandle BerryTickTimer;
 };

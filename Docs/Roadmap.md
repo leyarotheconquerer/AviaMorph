@@ -6,7 +6,7 @@ This is a very loose plan of attack for the project. I plan to update it... yeah
 * [ ] Create basic art assets
 	* [ ] Create player bird
 		* [x] Model
-		* [ ] Texture
+		* [x] Texture
 		* [ ] Animation
 			* [ ] Idle
 			* [ ] Fly
@@ -20,9 +20,9 @@ This is a very loose plan of attack for the project. I plan to update it... yeah
 			* [ ] Walk
 			* [ ] Transform
 			* [ ] Un-transform
-	* [ ] Create berry pickup
-		* [ ] Model
-		* [ ] Texture
+	* [x] Create berry pickup
+		* [x] Model
+		* [x] Texture
 	* [ ] Create three level islands
 		* [ ] Model
 		* [ ] Texture
@@ -33,8 +33,8 @@ This is a very loose plan of attack for the project. I plan to update it... yeah
 * [x] Program player movement
 	* [x] Program person movement
 	* [x] Program bird movement
-* [ ] Program berry pickup
-* [ ] Program shapeshift
+* [x] Program berry pickup
+* [x] Program shapeshift
 * [ ] Program energy consumption/requirement
 * [ ] Program menu
 * [ ] Program level changes and win conditions
