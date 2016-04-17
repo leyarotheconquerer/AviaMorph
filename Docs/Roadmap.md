@@ -48,7 +48,7 @@ This is a very loose plan of attack for the project. I plan to update it... yeah
 	* [ ] Create obstacles
 		* [ ] Model
 		* [ ] Texture
-* [ ] Arrange level 2
+* [x] Arrange level 2
 * [ ] Program obstacles and damage (energy reduction)
 * [ ] Arrange level 4
 * [ ] Program enemies
@@ -57,7 +57,7 @@ This is a very loose plan of attack for the project. I plan to update it... yeah
 		* [ ] Detect player switch
 		* [ ] Chase player behavior
 * [ ] Arrange remaining levels
-	* [ ] Level 3
+	* [x] Level 3
 	* [ ] Level 5
 	* [ ] Level 6
 * [ ] Make art awesome
