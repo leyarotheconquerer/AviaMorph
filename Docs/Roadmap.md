@@ -13,8 +13,8 @@ This is a very loose plan of attack for the project. I plan to update it... yeah
 			* [ ] Take off
 			* [ ] Land
 	* [ ] Create player person
-		* [ ] Model
-		* [ ] Texture
+		* [x] Model
+		* [x] Texture
 		* [ ] Animation
 			* [ ] Idle
 			* [ ] Walk
