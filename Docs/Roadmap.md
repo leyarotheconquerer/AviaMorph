@@ -23,9 +23,9 @@ This is a very loose plan of attack for the project. I plan to update it... yeah
 	* [x] Create berry pickup
 		* [x] Model
 		* [x] Texture
-	* [ ] Create three level islands
-		* [ ] Model
-		* [ ] Texture
+	* [x] Create three level islands
+		* [x] Model
+		* [x] Texture
 	* [x] Create goal berry
 		* [x] Model
 		* [x] Texture
