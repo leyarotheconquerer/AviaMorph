@@ -26,18 +26,18 @@ This is a very loose plan of attack for the project. I plan to update it... yeah
 	* [ ] Create three level islands
 		* [ ] Model
 		* [ ] Texture
-	* [ ] Create goal berry
-		* [ ] Model
-		* [ ] Texture
+	* [x] Create goal berry
+		* [x] Model
+		* [x] Texture
 * [ ] Arrange basic level 1
 * [x] Program player movement
 	* [x] Program person movement
 	* [x] Program bird movement
 * [x] Program berry pickup
 * [x] Program shapeshift
-* [ ] Program energy consumption/requirement
-* [ ] Program menu
-* [ ] Program level changes and win conditions
+* [x] Program energy consumption/requirement
+* [x] Program menu
+* [x] Program level changes and win conditions
 * [ ] Create additional basic art assets
 	* [ ] Create enemy bird
 		* [ ] Model
