@@ -119,8 +119,6 @@ void AMorphCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 {
 	check(InputComponent);
 
-	UE_LOG(MorphCharacterLog, Log, TEXT("I set up the player input"));
-
 	// Bind our control axis' to callback functions
 	InputComponent->BindAxis("Move Forward", this, &AMorphCharacter::MoveForwardInput);
 	InputComponent->BindAxis("Move Right", this, &AMorphCharacter::MoveRightInput);
@@ -263,10 +261,20 @@ void AMorphCharacter::TickBerry()
 
 void AMorphCharacter::Transform()
 {
-	UE_LOG(MorphCharacterLog, Log, TEXT("Working on morphing"));
 	EMorphType previousType = CurrentMorphType;
-	CurrentMorphType = (CurrentMorphType == EMorphType::MT_Bird ? EMorphType::MT_Dude : EMorphType::MT_Bird);
-	OnTransform(CurrentMorphType, previousType);
+	if (CurrentBerries > 0)
+	{
+		CurrentMorphType = (CurrentMorphType == EMorphType::MT_Bird ? EMorphType::MT_Dude : EMorphType::MT_Bird);
+	}
+	else
+	{
+		CurrentMorphType = EMorphType::MT_Dude;
+	}
+	
+	if (previousType != CurrentMorphType)
+	{
+		OnTransform(CurrentMorphType, previousType);
+	}
 
 	if (CurrentMorphType == EMorphType::MT_Bird)
 	{

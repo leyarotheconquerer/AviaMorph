@@ -29,7 +29,7 @@ This is a very loose plan of attack for the project. I plan to update it... yeah
 	* [x] Create goal berry
 		* [x] Model
 		* [x] Texture
-* [ ] Arrange basic level 1
+* [x] Arrange basic level 1
 * [x] Program player movement
 	* [x] Program person movement
 	* [x] Program bird movement
