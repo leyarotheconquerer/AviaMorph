@@ -8,7 +8,7 @@ This is a very loose plan of attack for the project. I plan to update it... yeah
 		* [x] Model
 		* [x] Texture
 		* [ ] Animation
-			* [ ] Idle
+			* [x] Idle
 			* [ ] Fly
 			* [ ] Take off
 			* [ ] Land
