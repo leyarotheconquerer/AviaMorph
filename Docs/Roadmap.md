@@ -12,14 +12,14 @@ This is a very loose plan of attack for the project. I plan to update it... yeah
 			* [ ] Fly
 			* [ ] Take off
 			* [ ] Land
-	* [ ] Create player person
+	* [x] Create player person
 		* [x] Model
 		* [x] Texture
-		* [ ] Animation
-			* [ ] Idle
-			* [ ] Walk
-			* [ ] Transform
-			* [ ] Un-transform
+		* [x] Animation
+			* [x] Idle
+			* [x] Walk
+			* [x] Transform
+			* [x] Un-transform
 	* [x] Create berry pickup
 		* [x] Model
 		* [x] Texture
