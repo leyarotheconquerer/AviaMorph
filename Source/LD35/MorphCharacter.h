@@ -103,6 +103,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Morph)
 	void Transform();
 
+	/** Actually changes the config values */
+	UFUNCTION(BlueprintCallable, Category = Morph)
+	void CompleteTransform();
+
 	/** Event called when character transforms */
 	UFUNCTION(BlueprintImplementableEvent, Category = Morph)
 	void OnTransform(EMorphType TargetMorphType, EMorphType PrevMorphType);
@@ -182,6 +186,9 @@ private:
 
 	/** Current roll speed */
 	float CurrentRollSpeed;
+
+	/** The morph currently in progress until Complete Transform is called */
+	EMorphType PendingMorph;
 
 	/** Handle for the berry tick timer */
 	FTimerHandle BerryTickTimer;

@@ -290,21 +290,24 @@ void AMorphCharacter::TickBerry()
 
 void AMorphCharacter::Transform()
 {
-	EMorphType previousType = CurrentMorphType;
 	if (CurrentBerries > 0)
 	{
-		CurrentMorphType = (CurrentMorphType == EMorphType::MT_Bird ? EMorphType::MT_Dude : EMorphType::MT_Bird);
+		PendingMorph = (CurrentMorphType == EMorphType::MT_Bird ? EMorphType::MT_Dude : EMorphType::MT_Bird);
 	}
 	else
 	{
-		CurrentMorphType = EMorphType::MT_Dude;
+		PendingMorph = EMorphType::MT_Dude;
 	}
 	
-	if (previousType != CurrentMorphType)
+	if (PendingMorph != CurrentMorphType)
 	{
-		OnTransform(CurrentMorphType, previousType);
+		OnTransform(PendingMorph, CurrentMorphType);
 	}
+}
 
+void AMorphCharacter::CompleteTransform()
+{
+	CurrentMorphType = PendingMorph;
 	if (CurrentMorphType == EMorphType::MT_Bird)
 	{
 		ResetFlightConfig();
